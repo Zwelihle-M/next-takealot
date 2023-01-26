@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 
-export default function ProductItem({ product }) {
+export default function ProductItem({ product, addToCartHandler }) {
   return (
     <div className="card">
       <Link href={`/product/${product.slug}`} legacyBehavior>
@@ -23,7 +23,7 @@ export default function ProductItem({ product }) {
         </Link>
         <p className=" text-blue-500 mb-2">{product.brand}</p>
         <p>R{product.price}</p>
-        <button className="primary-button w-full" type="button">Add to Cart</button>
+        <button className="primary-button w-full" type="button" onClick={() => addToCartHandler(product)}>Add to Cart</button>
       </div>
 
 

@@ -1,34 +1,43 @@
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import  { useRouter } from "next/router";
 import React, { useContext } from "react";
+import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
-import data from "../../utils/data";
+import Product from "../../models/Product";
+
+import db from "../../utils/db";
 import { Store } from "../../utils/Store";
 
-export default function ProductScreen() {
+export default function ProductScreen(props) {
+  const{product} = props;
   const { state, dispatch } = useContext(Store);
   const router = useRouter();
-  const { query } = useRouter();
-  const { slug } = query;
-  const product = data.products.find((x) => x.slug === slug);
+
+
+
 
   if (!product) {
-    return <div>Product Unavailble</div>;
+    return <Layout title={"Product Unavailible"}>Product Unavailble</Layout>;
   }
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
     const existItem = state.cart.cartItems.find((x) => x.slug === product.slug);
     const quantity = existItem ? existItem.quantity + 1 : 1;
+    // ajax request
+    const {data} = await axios.get(`/api/products/${product._id}`);
 
-    if (product.countInStock < quantity) {
-      alert("Out of stock");
+    if (data.countInStock < quantity) {
 
-      return;
+
+      return toast.error("Sorry, Out of stock")
     }
     dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
     router.push("/cart");
   };
+
+
   return (
     <Layout title={product.name}>
       <div className="py-2">
@@ -84,4 +93,23 @@ export default function ProductScreen() {
       </div>
     </Layout>
   );
+}
+
+// getting products from mongodb
+
+export async function getServerSideProps(context){
+
+  const {params} = context;
+  const{slug} = params;
+
+
+  await db.connect();
+  const product = await Product.findOne({slug}). lean();
+  await db.disconnect();
+
+  return{
+    props:{
+      product: product ? db.convertDocToObj(product) : null,
+    }
+  }
 }

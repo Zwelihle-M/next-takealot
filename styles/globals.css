@@ -33,6 +33,10 @@
     @apply rounded-full  py-2 px-4 shadow outline-none bg-gradient-to-r from-sky-400 to-blue-500
     text-white
   }
+
+  .default-button{
+    @apply rounded bg-gray-200 py-2 px-4 text-black shadow outline-none hover:bg-gray-400 active:bg-gray-500
+  }
   input,select,textarea{
     @apply rounded border p-2 outline-none ring-[#0B79BF] focus:ring
 
